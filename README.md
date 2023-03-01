@@ -1,1 +1,1 @@
-# kemba-trajectory-optimisation
+# Kemba Trajectory Optimisation
