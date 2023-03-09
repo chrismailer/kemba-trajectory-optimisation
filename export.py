@@ -10,39 +10,41 @@ from visualise import get_time_arrays
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-start_time = 1 # seconds
+# padding trajectory on either side with constant values
+start_delay = 10 # seconds
+end_delay = 10 # seconds
 
 # loading saved model
-with open('./kemba/cache/solution.pkl', mode='rb') as file:
+with open('./kemba/cache/jump-land-0.7.pkl', mode='rb') as file:
     model = cloudpickle.load(file)
 
 nfe, ncp = len(model.fe), len(model.cp)
 time, time_cp = get_time_arrays(model)
-time += start_time
+time += start_delay
 ctrl_dt = 5e-4
-ctrl_time = np.arange(0, time[-1], ctrl_dt)
+ctrl_time = np.arange(0, time[-1]+end_delay, ctrl_dt)
 
 piston_dead_time = 6e-3 # s
 
 # get data from model
 # front motor command
-θm_f = [model.joint_θ[fe,ncp,'front_hip'].value for fe in model.fe]
-θ̇m_f = [model.joint_dθ[fe,ncp,'front_hip'].value for fe in model.fe]
+θm_f = [-model.joint_θ[fe,ncp,'front_hip'].value-np.pi for fe in model.fe]
+θ̇m_f = [-model.joint_dθ[fe,ncp,'front_hip'].value for fe in model.fe]
 τm_f = [BW*model.τ_m[fe,'front_hip'].value for fe in model.fe]
 # back motor command
 θm_b = [model.joint_θ[fe,ncp,'back_hip'].value for fe in model.fe]
 θ̇m_b = [model.joint_dθ[fe,ncp,'back_hip'].value for fe in model.fe]
 τm_b = [BW*model.τ_m[fe,'back_hip'].value for fe in model.fe]
-# front piston command
-ue_f = [model.u[fe,'front_knee','extend'].value for fe in model.fe]
-ur_f = [model.u[fe,'front_knee','retract'].value for fe in model.fe]
+# front piston command (round to nearest integer [0,1])
+ue_f = np.rint([model.u[fe,'front_knee','extend'].value for fe in model.fe])
+ur_f = np.rint([model.u[fe,'front_knee','retract'].value for fe in model.fe])
 # front piston desired state
 xp_f = [model.q[fe,ncp,'l5'].value-0.048 for fe in model.fe]
 ẋp_f = [model.dq[fe,ncp,'l5'].value for fe in model.fe]
 Fp_f = [BW*model.F_p[fe,ncp,'front_knee'].value for fe in model.fe]
-# back piston command
-ue_b = [model.u[fe,'back_knee','extend'].value for fe in model.fe]
-ur_b = [model.u[fe,'back_knee','retract'].value for fe in model.fe]
+# back piston command (round to nearest integer [0,1])
+ue_b = np.rint([model.u[fe,'back_knee','extend'].value for fe in model.fe])
+ur_b = np.rint([model.u[fe,'back_knee','retract'].value for fe in model.fe])
 # back piston desired state
 xp_b = [model.q[fe,ncp,'l6'].value-0.048 for fe in model.fe]
 ẋp_b = [model.dq[fe,ncp,'l6'].value for fe in model.fe]
@@ -92,8 +94,8 @@ ddy = interp1d(time, ddy, kind='zero', fill_value=(0, 0), bounds_error=False)
 
 # assign to dataframe
 trajs = pd.DataFrame({'time':ctrl_time})
-trajs['qm_f'] = -θm_f(ctrl_time)-np.pi
-trajs['wm_f'] = -θ̇m_f(ctrl_time)
+trajs['qm_f'] = θm_f(ctrl_time)
+trajs['wm_f'] = θ̇m_f(ctrl_time)
 trajs['tm_f'] = τm_f(ctrl_time)
 
 trajs['qm_b'] = θm_b(ctrl_time)
@@ -122,8 +124,8 @@ trajs['ddx'] = ddx(ctrl_time)
 trajs['ddy'] = ddy(ctrl_time)
 
 fig, ax = plt.subplots()
-ax.scatter(time, θm_f(time))
-ax.plot(ctrl_time, θm_f(ctrl_time), color='r')
+ax.scatter(time, ue_f(time))
+ax.plot(ctrl_time, ue_f(ctrl_time), color='r')
 
 trajs.to_csv('traj.csv', sep=',', encoding='utf-8', index=False)
 

@@ -100,8 +100,8 @@ def animate(model, speed=1.0, follow=False, GIF=False):
     # update function for animation
     def plot(fe,m,ax):
         ax.clear()
-        ax.set_xlim([x_min-0.6, x_max+0.6])
-        ax.set_ylim([0, y_max+0.5])
+        ax.set_xlim([x_min-0.4, x_max+0.4])
+        ax.set_ylim([0, y_max+0.4])
         if follow: ax.set_xticks([])
         # plotting piston
         vars = [m.q[fe,ncp,dof].value for dof in gDOF]

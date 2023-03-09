@@ -44,7 +44,7 @@ class PistonRod():
 
 
 class Rotor():
-    N = 6
+    N = 6 # gear ratio
     m = 0
     I = 12e-5 # inertia [kgm^2]
     M = Matrix([[m,m,I]])

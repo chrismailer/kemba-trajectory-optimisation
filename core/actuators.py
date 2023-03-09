@@ -77,7 +77,7 @@ class DSNU_25_70:
     def force(self, ue, ur, F, Fe, Fr, ẋ):
         return F == Fe - Fr - ẋ * self.c(ue,ur)
     
-    # euler integration
+    # implicit euler integration
     def integration(self, F, dF):
         def func(m,fe,cp,j):
             assert cp == 1 and len(m.cp) == 1
