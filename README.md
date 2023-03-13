@@ -25,7 +25,7 @@ Code to generate optimal trajectories for [Kemba](https://youtu.be/u2Hn26uojoM) 
     │   └── utils.py            # Solver function and parameters
     ├── figures                 # Folder for figures from visualise.py
     │   └── ...
-    ├── kemba                   # File specific to robot and optimisation formulation
+    ├── kemba                   # Files specific to robot and optimisation formulation
     │   ├── cache               # Folder for cached files
     |   │   ├── dynamics.pkl    # Cached dynamics
     |   │   └── solution.pkl    # Cached optimisation solution
@@ -35,5 +35,6 @@ Code to generate optimal trajectories for [Kemba](https://youtu.be/u2Hn26uojoM) 
     │   └── tasks.py            # Tasks pyomo formulation
     ├── export.py               # Export optimisation solution to .csv file
     ├── optimise.py             # Run trajectory optimisation
-    └── requirements.txt        # Python dependencies
+    ├── requirements.txt        # Python dependencies
+    └── visualise.py            # Animate and plot optimisation solution
 
